@@ -3,6 +3,7 @@ from flask_cors import CORS,cross_origin
 import requests
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen as uReq
+import re
 import logging
 logging.basicConfig(filename="scrapper.log" , level=logging.INFO)
 
@@ -17,8 +18,9 @@ def index():
     if request.method == 'POST':
         try:
             searchString = request.form['content'].replace(" ","")
-            flipkart_url = "https://www.flipkart.com/search?q=" + searchString
-            uClient = uReq(flipkart_url)
+            if not re.match(r"^https?://", searchString):
+                searchString = "http://" + searchString
+            uClient = uReq(searchString)
             flipkartPage = uClient.read()
             uClient.close()
             flipkart_html = bs(flipkartPage, "html.parser")
